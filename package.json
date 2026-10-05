@@ -1,0 +1,39 @@
+{
+  "name": "matrix-planner",
+  "version": "1.0.0",
+  "description": "Matrix Planner - futuristic task planner",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win",
+    "build:android": "npx cap sync && cd android && gradlew assembleDebug"
+  },
+  "author": "Harsh Komarpant",
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "electron": "^32.0.1",
+    "electron-builder": "^25.0.5"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "build": {
+    "appId": "com.matrix.planner",
+    "productName": "Matrix Planner",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
