@@ -27,8 +27,9 @@ Matrix Planner is built as a single-page web app but is packaged for native plat
 ### Android APK (Direct Download)
 You don't need to compile the app yourself! Every time the code is updated, a fresh Android `.apk` is automatically built and published.
 
-👉 **[Download the Latest Android APK Directly Here](https://github.com/komarpant/Matrix_Planner/releases/download/latest/MatrixPlanner.apk)**
-*(Clicking this link will immediately start the download. It does not require a GitHub account!)*
+[![Download Android APK](https://img.shields.io/badge/Download-Android_APK-D1FF00?style=for-the-badge&logo=android&logoColor=black&labelColor=1A1D1A)](https://github.com/komarpant/Matrix_Planner/releases/download/latest/MatrixPlanner.apk)
+
+*(Clicking this button will immediately start the download. It does not require a GitHub account!)*
 
 ## Getting Started
 
