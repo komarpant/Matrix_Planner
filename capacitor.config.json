@@ -1,0 +1,6 @@
+{
+  "appId": "com.matrix.planner",
+  "appName": "Matrix Planner",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
