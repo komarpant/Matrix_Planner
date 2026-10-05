@@ -1016,42 +1016,76 @@
     /* ===== MOBILE RESPONSIVENESS ===== */
     @media (max-width: 600px) {
       :root {
-        --nav-h: 110px;
-        --hud-h: 50px;
+        --nav-h: 105px;
+        --hud-h: 55px;
       }
 
       .top-nav {
         flex-wrap: wrap;
-        padding-top: calc(8px + var(--safe-top));
-        padding-bottom: 0;
-        gap: 0;
+        padding: calc(12px + var(--safe-top)) 16px 0 16px;
+        height: var(--nav-h);
       }
 
       .nav-brand {
-        margin-right: auto;
+        flex: 1;
+        margin-right: 0;
         font-size: 14px;
       }
 
       #settingsBtn {
+        width: 36px !important;
+        height: 36px !important;
         margin-left: auto !important;
       }
 
       .nav-tabs {
         width: 100%;
         order: 3;
-        gap: 0;
-        justify-content: space-around;
+        margin-top: 12px;
         border-top: 1px solid var(--graphite);
-        margin-top: 4px;
+        gap: 20px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .nav-tabs::-webkit-scrollbar {
+        display: none;
       }
 
       .nav-tab {
-        font-size: 10px;
-        letter-spacing: 0.05em;
-        padding: 10px 6px;
-        flex: 1;
-        justify-content: center;
-        text-align: center;
+        flex: 0 0 auto;
+        font-size: 11px;
+        padding: 12px 2px;
+        letter-spacing: 0.1em;
+      }
+
+      .main-container {
+        padding: calc(var(--nav-h) + var(--safe-top) + 20px) 16px calc(var(--hud-h) + var(--safe-bottom) + 20px) 16px;
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+      }
+
+      .view-title {
+        font-size: 28px;
+        margin-top: 4px;
+      }
+
+      .nav-controls {
+        width: 100%;
+        justify-content: flex-end;
+      }
+      
+      .icon-btn {
+        width: 40px;
+        height: 40px;
       }
 
       .calendar-grid {
@@ -1059,23 +1093,24 @@
       }
 
       .day-cell {
-        min-height: 56px;
+        min-height: 70px;
         padding: 6px;
       }
 
       .day-number {
-        font-size: 13px;
+        font-size: 12px;
       }
 
       .weekday-header {
-        padding: 10px 4px;
-        font-size: 10px;
-        letter-spacing: 0.1em;
+        padding: 10px 0;
+        font-size: 9px;
+        letter-spacing: 0.05em;
       }
 
       .indicators {
-        gap: 3px;
-        margin-top: 4px;
+        gap: 4px;
+        margin-top: 6px;
+        flex-wrap: wrap;
       }
 
       .indicator-mark {
@@ -1084,28 +1119,21 @@
       }
 
       .indicator-note {
-        width: 10px;
-        height: 5px;
-      }
-
-      .header-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-
-      .view-title {
-        font-size: clamp(24px, 7vw, 40px);
+        width: 12px;
+        height: 4px;
       }
 
       .side-panel {
         max-width: 100%;
-        padding: calc(24px + var(--safe-top)) calc(20px + var(--safe-right)) calc(24px + var(--safe-bottom)) 20px;
+        padding: calc(20px + var(--safe-top)) 20px calc(20px + var(--safe-bottom)) 20px;
       }
 
       .panel-date {
-        font-size: 18px;
+        font-size: 20px;
+      }
+
+      .form-textarea {
+        height: 200px;
       }
 
       .notes-layout {
@@ -1125,13 +1153,14 @@
       }
 
       .note-tab-btn {
-        padding: 10px 14px;
+        padding: 12px 16px;
         font-size: 11px;
         white-space: nowrap;
+        flex: 0 0 auto;
       }
 
       .notes-content {
-        min-height: 50vh;
+        min-height: 60vh;
       }
 
       #genNotesTab > div {
@@ -1143,8 +1172,8 @@
         border-right: none !important;
         border-bottom: 1px solid var(--graphite);
         padding-right: 0 !important;
-        padding-bottom: 12px;
-        max-height: 150px;
+        padding-bottom: 16px;
+        max-height: 200px;
       }
 
       #genNotesTab > div > div:last-child {
@@ -1152,26 +1181,39 @@
       }
 
       .gen-title-input {
-        font-size: 18px;
+        font-size: 20px;
       }
 
       .note-controls {
         flex-wrap: wrap;
       }
 
+      .add-row-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 12px;
+        font-size: 11px;
+      }
+
       .timeline-table th,
       .timeline-table td {
-        padding: 12px 10px;
-        font-size: 12px;
+        padding: 14px 12px;
+        font-size: 11px;
       }
 
       .hud {
-        gap: 6px;
+        gap: 8px;
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
       .hud-status {
         font-size: 8px;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
+        max-width: 45%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .hud-center {
@@ -1179,22 +1221,26 @@
       }
 
       .hud-btn {
-        font-size: 8px;
-        padding: 4px 6px;
+        font-size: 9px;
+        padding: 6px 8px;
       }
 
       .settings-modal {
         width: 95%;
-        max-height: 85vh;
+        max-height: 90vh;
       }
 
       .settings-tab {
         font-size: 10px;
-        padding: 12px 8px;
+        padding: 14px 8px;
       }
 
       .theme-controls {
-        flex-wrap: wrap;
+        flex-direction: column;
+      }
+      
+      .form-select {
+        width: 100%;
       }
     }
 
