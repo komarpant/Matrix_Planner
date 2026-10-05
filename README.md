@@ -1,4 +1,4 @@
-# MATRIX // PLANNER
+# MATRIX  PLANNER
 
 [![Build Android APK](https://github.com/komarpant/Matrix_Planner/actions/workflows/android.yml/badge.svg)](https://github.com/komarpant/Matrix_Planner/actions/workflows/android.yml)
 
