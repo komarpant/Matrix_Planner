@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MATRIX // PLANNER</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --titanium: #F4F5F6;
+      --carbon: #0D0E15;
+      --volt: #D1FF00;
+      --steel: #D9E0E4;
+      --graphite: #1A1D1A;
+      --white: #FFFFFF;
+      --hud-h: 60px;
+      --nav-h: 70px;
+      --ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--carbon);
+      color: var(--titanium);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--graphite) 1px, transparent 1px),
+        linear-gradient(90deg, var(--graphite) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.8;
+      z-index: -1;
+    }
+
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--nav-h);
+      background: rgba(13, 14, 21, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--graphite);
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(20px, 4vw, 40px);
+      z-index: 90;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      font-size: 16px;
+      color: var(--titanium);
+      margin-right: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-brand .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--volt);
+      box-shadow: 0 0 8px var(--volt);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 32px;
+      height: 100%;
+    }
+
+    .nav-tab {
+      background: none;
+      border: none;
+      color: var(--steel);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      height: 100%;
+      position: relative;
+      transition: color 0.3s var(--ease-silk);
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-tab:hover {
+      color: var(--titanium);
+    }
+
+    .nav-tab.active {
+      color: var(--volt);
+      font-weight: 700;
+    }
+
+    .nav-tab::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--volt);
+      transform: scaleX(0);
+      transition: transform 0.3s var(--ease-silk);
+    }
+
+    .nav-tab.active::after {
+      transform: scaleX(1);
+    }
+
+    .main-container {
+      flex: 1;
+      padding: calc(var(--nav-h) + 40px) 24px calc(var(--hud-h) + 40px);
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeIn 0.4s var(--ease-silk);
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--graphite);
+      padding-bottom: 20px;
+    }
+
+    .header-tag {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--volt);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .view-title {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--graphite);
+      background: rgba(13, 14, 21, 0.6);
+      color: var(--titanium);
+      cursor: pointer;
+      transition: all 0.3s var(--ease-silk);
+      backdrop-filter: blur(4px);
+    }
+
+    .icon-btn:hover {
+      background: var(--volt);
+      border-color: var(--volt);
+      color: var(--carbon);
+      box-shadow: 0 0 16px rgba(209, 255, 0, 0.4);
+    }
+
+    .nav-controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--graphite);
+      border: 1px solid var(--graphite);
+    }
+
+    .weekday-header {
+      background: rgba(13, 14, 21, 0.9);
+      padding: 16px 10px;
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: rgba(217, 224, 228, 0.5);
+      text-transform: uppercase;
+    }
+
+    .day-cell {
+      background: rgba(13, 14, 21, 0.8);
+      min-height: 120px;
+      padding: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s var(--ease-silk), border-color 0.3s var(--ease-silk);
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .day-cell:hover {
+      background: rgba(26, 29, 26, 0.9);
+      border-color: rgba(209, 255, 0, 0.3);
+    }
+
+    .day-cell.empty {
+      background: rgba(13, 14, 21, 0.4);
+      cursor: default;
+    }
+
+    .day-cell.empty:hover {
+      border-color: transparent;
+    }
+
+    .day-number {
+      font-size: 16px;
+      color: var(--titanium);
+      margin-bottom: auto;
+    }
+
+    .day-cell.today .day-number {
+      color: var(--volt);
+      font-weight: 700;
+    }
+
+    .indicators {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .indicator-mark {
+      width: 8px;
+      height: 8px;
+      background: var(--volt);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--volt);
+    }
+
+    .indicator-note {
+      width: 16px;
+      height: 8px;
+      background: var(--steel);
+      border-radius: 2px;
+    }
+
+    .timeline-container {
+      background: rgba(13, 14, 21, 0.6);
+      border: 1px solid var(--graphite);
+      overflow-x: auto;
+    }
+
+    .timeline-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .timeline-table th {
+      background: rgba(26, 29, 26, 0.9);
+      color: var(--volt);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--graphite);
+    }
+
+    .timeline-table td {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(26, 29, 26, 0.8);
+      color: var(--titanium);
+      vertical-align: top;
+      transition: background 0.2s;
+    }
+
+    .timeline-table tr:hover td {
+      background: rgba(26, 29, 26, 0.4);
+    }
+
+    .editable-cell {
+      outline: none;
+      padding: 8px;
+      margin: -8px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      min-height: 1.5em;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .editable-cell:focus {
+      border-color: var(--graphite);
+      background: rgba(13, 14, 21, 0.9);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .cell-month {
+      width: 20%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--steel);
+    }
+
+    .month-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .date-picker-input {
+      background: rgba(13, 14, 21, 0.6);
+      border: 1px solid var(--graphite);
+      color: var(--volt);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 6px;
+      outline: none;
+      border-radius: 2px;
+      width: 100%;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .date-picker-input:focus {
+      border-color: var(--volt);
+    }
+
+    .date-picker-input::-webkit-calendar-picker-indicator {
+      filter: invert(1) sepia(1) saturate(5) hue-rotate(20deg);
+      cursor: pointer;
+    }
+
+    .cell-phase {
+      width: 25%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #a4b1c2;
+    }
+
+    .cell-focus {
+      width: 50%;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .cell-actions {
+      width: 5%;
+      text-align: right;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #ff4757;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0.3;
+      transition: all 0.2s;
+    }
+
+    .timeline-table tr:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .delete-btn:hover {
+      text-shadow: 0 0 10px #ff4757;
+      transform: scale(1.1);
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: flex-end;
+      padding: 20px;
+      border-top: 1px solid var(--graphite);
+      background: rgba(13, 14, 21, 0.8);
+    }
+
+    .add-row-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--volt);
+      color: var(--volt);
+      padding: 10px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .add-row-btn:hover {
+      background: var(--volt);
+      color: var(--carbon);
+      box-shadow: 0 0 16px rgba(209, 255, 0, 0.3);
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      background: rgba(13, 14, 21, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-left: 1px solid var(--graphite);
+      z-index: 100;
+      transition: right 0.6s var(--ease-silk);
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .side-panel.open {
+      right: 0;
+    }
+
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .panel-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--graphite);
+      padding-bottom: 20px;
+    }
+
+    .panel-date {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--volt);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--steel);
+      cursor: pointer;
+      font-size: 24px;
+      transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+      color: var(--volt);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--steel);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .form-textarea {
+      width: 100%;
+      height: 180px;
+      background: rgba(26, 29, 26, 0.5);
+      border: 1px solid var(--graphite);
+      color: var(--titanium);
+      padding: 16px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--volt);
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .toggle-box {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--graphite);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .toggle-input {
+      display: none;
+    }
+
+    .toggle-input:checked+.toggle-box {
+      background: var(--volt);
+      border-color: var(--volt);
+      box-shadow: 0 0 10px rgba(209, 255, 0, 0.3);
+    }
+
+    .toggle-box::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--carbon);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toggle-input:checked+.toggle-box::after {
+      opacity: 1;
+    }
+
+    .save-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 20px;
+      background: transparent;
+      border: 1px solid var(--volt);
+      color: var(--volt);
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .save-btn:hover {
+      background: var(--volt);
+      color: var(--carbon);
+      box-shadow: 0 0 20px rgba(209, 255, 0, 0.4);
+    }
+
+    .notes-layout {
+      display: flex;
+      gap: 40px;
+      height: calc(100vh - 250px);
+    }
+
+    .notes-sidebar {
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-right: 1px solid var(--graphite);
+      padding-right: 20px;
+    }
+
+    .note-tab-btn {
+      text-align: left;
+      background: rgba(13, 14, 21, 0.6);
+      border: 1px solid var(--graphite);
+      color: var(--steel);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .note-tab-btn:hover,
+    .note-tab-btn.active {
+      background: rgba(26, 29, 26, 0.9);
+      border-color: var(--volt);
+      color: var(--volt);
+    }
+
+    .notes-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .notes-content.active {
+      display: flex;
+    }
+
+    .note-card {
+      background: rgba(13, 14, 21, 0.6);
+      border: 1px solid var(--graphite);
+      padding: 24px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .note-card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .note-card-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--volt);
+    }
+
+    .note-card-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--titanium);
+      white-space: pre-wrap;
+    }
+
+    .important-badge {
+      background: var(--volt);
+      color: var(--carbon);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .gen-note-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+    }
+
+    .gen-title-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--graphite);
+      color: var(--titanium);
+      font-size: 24px;
+      padding: 12px 0;
+      outline: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .gen-title-input:focus {
+      border-color: var(--volt);
+    }
+
+    .gen-content-input {
+      flex: 1;
+      background: rgba(13, 14, 21, 0.4);
+      border: 1px solid var(--graphite);
+      color: var(--titanium);
+      padding: 16px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+    }
+
+    .gen-content-input:focus {
+      border-color: var(--volt);
+    }
+
+    .note-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: flex-end;
+    }
+
+    .hud {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--hud-h);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 4vw, 40px);
+      background: rgba(13, 14, 21, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--graphite);
+    }
+
+    .hud-status {
+      font-size: 10px;
+      color: var(--steel);
+      letter-spacing: 0.15em;
+    }
+
+    .hud-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--steel);
+      letter-spacing: 0.15em;
+    }
+
+    /* Settings Modal */
+    .settings-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .settings-modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .settings-modal {
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      background: rgba(13, 14, 21, 0.95);
+      border: 1px solid var(--volt);
+      box-shadow: 0 0 30px rgba(209, 255, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .settings-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--graphite);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .settings-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--graphite);
+    }
+
+    .settings-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 16px;
+      color: var(--steel);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .settings-tab.active {
+      background: rgba(209, 255, 0, 0.1);
+      color: var(--volt);
+      border-bottom: 2px solid var(--volt);
+    }
+
+    .settings-tab:hover:not(.active) {
+      background: rgba(26, 29, 26, 0.9);
+      color: var(--titanium);
+    }
+
+    .settings-content {
+      padding: 24px;
+      display: none;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .settings-content.active {
+      display: block;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .color-item {
+      display: flex;
+      flex-direction: column;
+      background: rgba(26, 29, 26, 0.5);
+      padding: 12px 16px;
+      border: 1px solid var(--graphite);
+      border-radius: 4px;
+    }
+
+    .color-item label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--titanium);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .color-item .color-desc {
+      font-size: 11px;
+      color: var(--steel);
+      margin-bottom: 12px;
+    }
+
+    .color-picker {
+      -webkit-appearance: none;
+      border: none;
+      width: 100%;
+      height: 32px;
+      background: none;
+      cursor: pointer;
+    }
+
+    .color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-picker::-webkit-color-swatch {
+      border: 1px solid var(--graphite);
+      border-radius: 2px;
+    }
+
+    .theme-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .form-select {
+      background: rgba(13, 14, 21, 0.6);
+      border: 1px solid var(--graphite);
+      color: var(--volt);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 10px;
+      outline: none;
+      border-radius: 2px;
+      flex: 1;
+    }
+
+    .form-select:focus {
+      border-color: var(--volt);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-grid"></div>
+
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="dot"></span> MATRIX PLANNER
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-target="calendarView">Calendar Matrix</button>
+      <button class="nav-tab" data-target="timelineView">Timeline Protocol</button>
+      <button class="nav-tab" data-target="notesView">Datacore Notes</button>
+    </div>
+    <button class="icon-btn" id="settingsBtn" style="margin-left: auto; width: 40px; height: 40px; border-radius: 4px;"
+      aria-label="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+        <path
+          d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+      </svg>
+    </button>
+  </nav>
+
+  <main class="main-container">
+
+    <div id="calendarView" class="view-section active">
+      <header class="header-section">
+        <div>
+          <span class="mono header-tag">01 / TIMELINE MATRIX</span>
+          <h1 class="view-title" id="monthDisplay">LOADING...</h1>
+        </div>
+        <div class="nav-controls">
+          <button class="icon-btn" id="prevMonth" aria-label="Previous Month">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button class="icon-btn" id="nextMonth" aria-label="Next Month">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="calendar-grid" id="calendarGrid">
+        <div class="weekday-header mono">Sun</div>
+        <div class="weekday-header mono">Mon</div>
+        <div class="weekday-header mono">Tue</div>
+        <div class="weekday-header mono">Wed</div>
+        <div class="weekday-header mono">Thu</div>
+        <div class="weekday-header mono">Fri</div>
+        <div class="weekday-header mono">Sat</div>
+      </div>
+    </div>
+
+    <div id="timelineView" class="view-section">
+      <header class="header-section">
+        <div>
+          <span class="mono header-tag">02 / ROADMAP PROJECTION</span>
+          <h1 class="view-title">PLANNED TIMELINE</h1>
+        </div>
+      </header>
+
+      <div class="timeline-container">
+        <table class="timeline-table">
+          <thead>
+            <tr>
+              <th>Date Anchor</th>
+              <th>Phase</th>
+              <th>Focus Area</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="timelineBody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+        <div class="action-row">
+          <button class="add-row-btn" id="addRowBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Initialize Row
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="notesView" class="view-section">
+      <header class="header-section">
+        <div>
+          <span class="mono header-tag">03 / CENTRAL DATACORE</span>
+          <h1 class="view-title">NOTES & LOGS</h1>
+        </div>
+      </header>
+
+      <div class="notes-layout">
+        <div class="notes-sidebar">
+          <button class="note-tab-btn active" data-subtarget="calNotesTab">Calendar Matrix</button>
+          <button class="note-tab-btn" data-subtarget="genNotesTab">Important Notes</button>
+        </div>
+
+        <!-- Sub-view: Calendar Matrix Notes -->
+        <div class="notes-content active" id="calNotesTab">
+          <div id="calNotesListContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Sub-view: Important General Notes -->
+        <div class="notes-content" id="genNotesTab">
+          <div style="display: flex; gap: 20px; height: 100%;">
+            <div style="width: 30%; border-right: 1px solid var(--graphite); padding-right: 16px; overflow-y: auto;"
+              id="genNotesList">
+              <!-- Populated via JS -->
+            </div>
+            <div style="width: 70%;" class="gen-note-editor">
+              <input type="text" class="gen-title-input" id="genNoteTitle" placeholder="Record Title...">
+              <textarea class="gen-content-input" id="genNoteContent"
+                placeholder="Initialize data stream..."></textarea>
+              <div class="note-controls">
+                <button class="add-row-btn" id="newGenNoteBtn"
+                  style="border-color: var(--steel); color: var(--steel);">New Record</button>
+                <button class="add-row-btn" id="deleteGenNoteBtn"
+                  style="border-color: #ff4757; color: #ff4757; display:none;">Purge</button>
+                <button class="add-row-btn" id="saveGenNoteBtn">Commit Record</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="panel-overlay" id="panelOverlay"></div>
+  <aside class="side-panel" id="sidePanel">
+    <div class="panel-header">
+      <h2 class="panel-date mono" id="panelDateDisplay">--/--/----</h2>
+      <button class="close-btn" id="closePanel">×</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label mono">Sector Logs (Notes)</label>
+      <textarea class="form-textarea" id="noteInput" placeholder="Enter log data..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="toggle-group">
+        <input type="checkbox" class="toggle-input" id="markToggle">
+        <div class="toggle-box"></div>
+        <span class="form-label mono" style="margin:0;">Flag as Critical</span>
+      </label>
+    </div>
+
+    <button class="save-btn mono" id="saveDataBtn">Commit Record</button>
+  </aside>
+
+  <footer class="hud">
+    <div class="hud-status mono" id="hudStatus">SYSTEM ONLINE // SECURE CONNECTION</div>
+    <div class="hud-center mono">Made by Komarpant</div>
+    <div class="hud-status mono" id="hudTime">00:00:00</div>
+  </footer>
+
+  <div class="settings-modal-overlay" id="settingsOverlay">
+    <div class="settings-modal">
+      <div class="settings-header">
+        <h2 class="mono" style="color: var(--volt);">SYSTEM SETTINGS</h2>
+        <button class="close-btn" id="closeSettings">×</button>
+      </div>
+
+      <div class="settings-tabs">
+        <button class="settings-tab active" data-target="themeSettings">UI Theme Configuration</button>
+        <button class="settings-tab" data-target="aboutSettings">About the Website</button>
+      </div>
+
+      <div class="settings-content active" id="themeSettings">
+        <p class="mono" style="font-size: 12px; color: var(--steel); margin-bottom: 5px;">Design System Colors (6 Core
+          Colors)</p>
+        <p style="font-size: 11px; color: var(--steel); margin-bottom: 20px;">
+          Inspired by <a href="https://templatemo.com/live/templatemo_629_nexus_system" target="_blank"
+            style="color: var(--volt); text-decoration: underline;">Nexus System</a>
+        </p>
+
+        <div class="theme-controls">
+          <select id="themeSelect" class="form-select">
+            <option value="default">Nexus System (Default)</option>
+          </select>
+          <button id="saveNewThemeBtn" class="add-row-btn" style="padding: 10px 16px;">Save As New</button>
+          <button id="deleteThemeBtn" class="add-row-btn"
+            style="padding: 10px 16px; border-color: #ff4757; color: #ff4757; display: none;">Delete</button>
+        </div>
+
+        <div class="color-grid">
+          <div class="color-item">
+            <label>Titanium</label>
+            <span class="color-desc">Used for primary text and highlighted text. Default: #F4F5F6</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--titanium" value="#F4F5F6">
+          </div>
+          <div class="color-item">
+            <label>Carbon</label>
+            <span class="color-desc">Main background, primary dark shade. Default: #0D0E15</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--carbon" value="#0D0E15">
+          </div>
+          <div class="color-item">
+            <label>Volt</label>
+            <span class="color-desc">Accent color, active tabs, buttons, important flags. Default: #D1FF00</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--volt" value="#D1FF00">
+          </div>
+          <div class="color-item">
+            <label>Steel</label>
+            <span class="color-desc">Secondary text, inactive tabs, borders. Default: #D9E0E4</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--steel" value="#D9E0E4">
+          </div>
+          <div class="color-item">
+            <label>Graphite</label>
+            <span class="color-desc">Grid lines, borders, secondary dark background. Default: #1A1D1A</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--graphite" value="#1A1D1A">
+          </div>
+          <div class="color-item">
+            <label>White</label>
+            <span class="color-desc">Pure white highlights. Default: #FFFFFF</span>
+            <input type="color" class="color-picker theme-color-input" data-var="--white" value="#FFFFFF">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-content" id="aboutSettings">
+        <h3 style="color: var(--volt); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace;">About Matrix
+          Planner</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: var(--titanium); margin-bottom: 20px;">
+          This website is a futuristic, highly functional planner designed to organize complex tasks, roadmap
+          projections, and daily logs in an efficient, distraction-free environment. It helps users manage their
+          timelines systematically, combining calendar views with targeted roadmap planning and central datacore notes.
+          <br><br>
+          It is especially useful for managing long-term career shifts or complex project phases tracking focus areas,
+          while offering a fast, responsive, localized workflow.
+          <br><br>
+          <span style="color: var(--volt);">Fun Fact:</span> This entire planner was conceptualized and built by the
+          user in just 1 night!
+        </p>
+
+        <h3 style="color: var(--volt); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace;">Developer Stats
+        </h3>
+        <ul style="font-size: 14px; line-height: 2; color: var(--titanium); list-style: none;">
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">Name:</span>
+            Harsh Komarpant</li>
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">Age
+              (When Made):</span> 19</li>
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">Education:</span>
+            BE Computer Engineering</li>
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">GitHub:</span>
+            komarpant</li>
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">Instagram:</span>
+            harshbeingharsh</li>
+          <li><span
+              style="color: var(--steel); font-family: 'JetBrains Mono', monospace; width: 180px; display: inline-block;">Email:</span>
+            Harshkoamrpant10@gmail.com</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      let currentDate = new Date();
+      let selectedDateStr = null;
+      let activeGenNoteId = null;
+
+      const CALENDAR_STORAGE_KEY = 'matrix_calendar_data';
+      const TIMELINE_STORAGE_KEY = 'matrix_timeline_v1';
+      const NOTES_STORAGE_KEY = 'matrix_important_notes';
+      const THEMES_STORAGE_KEY = 'matrix_themes_v1';
+
+      let eventsData = JSON.parse(localStorage.getItem(CALENDAR_STORAGE_KEY)) || {};
+      let savedThemes = JSON.parse(localStorage.getItem(THEMES_STORAGE_KEY));
+
+      const hardcodedThemes = {
+        "Cyberpunk": {
+          "--titanium": "#FCE205", "--carbon": "#0B0C10", "--volt": "#FF007F",
+          "--steel": "#45A29E", "--graphite": "#1F2833", "--white": "#FFFFFF"
+        },
+        "Ocean": {
+          "--titanium": "#E0FBFC", "--carbon": "#293241", "--volt": "#EE6C4D",
+          "--steel": "#98C1D9", "--graphite": "#3D5A80", "--white": "#FFFFFF"
+        }
+      };
+
+      if (!savedThemes) {
+        savedThemes = JSON.parse(JSON.stringify(hardcodedThemes));
+        localStorage.setItem(THEMES_STORAGE_KEY, JSON.stringify(savedThemes));
+      }
+
+      const defaultNotes = [];
+
+      let importantNotes = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY));
+      if (!importantNotes || importantNotes.length === 0) {
+        importantNotes = JSON.parse(JSON.stringify(defaultNotes));
+        localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(importantNotes));
+      }
+
+      const defaultColors = {
+        '--titanium': '#F4F5F6',
+        '--carbon': '#0D0E15',
+        '--volt': '#D1FF00',
+        '--steel': '#D9E0E4',
+        '--graphite': '#1A1D1A',
+        '--white': '#FFFFFF'
+      };
+
+      const defaultRoadmap = [];
+
+      let timelineData = JSON.parse(localStorage.getItem(TIMELINE_STORAGE_KEY));
+      if (!timelineData || timelineData.length === 0) {
+        timelineData = JSON.parse(JSON.stringify(defaultRoadmap));
+        localStorage.setItem(TIMELINE_STORAGE_KEY, JSON.stringify(timelineData));
+      }
+
+      const tabs = document.querySelectorAll('.nav-tab');
+      const views = document.querySelectorAll('.view-section');
+      const hudStatus = document.getElementById('hudStatus');
+
+      const monthDisplay = document.getElementById('monthDisplay');
+      const calendarGrid = document.getElementById('calendarGrid');
+      const sidePanel = document.getElementById('sidePanel');
+      const panelOverlay = document.getElementById('panelOverlay');
+      const noteInput = document.getElementById('noteInput');
+      const markToggle = document.getElementById('markToggle');
+
+      const timelineBody = document.getElementById('timelineBody');
+      const addRowBtn = document.getElementById('addRowBtn');
+
+      const noteTabs = document.querySelectorAll('.note-tab-btn');
+      const noteContents = document.querySelectorAll('.notes-content');
+      const calNotesListContainer = document.getElementById('calNotesListContainer');
+      const genNotesList = document.getElementById('genNotesList');
+      const genNoteTitle = document.getElementById('genNoteTitle');
+      const genNoteContent = document.getElementById('genNoteContent');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          views.forEach(v => v.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.target).classList.add('active');
+          if (tab.dataset.target === 'notesView') renderCalendarNotesList(); // Refresh lists when opening notes
+        });
+      });
+
+      noteTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          noteTabs.forEach(t => t.classList.remove('active'));
+          noteContents.forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.subtarget).classList.add('active');
+        });
+      });
+
+      function saveTimelineData() {
+        localStorage.setItem(TIMELINE_STORAGE_KEY, JSON.stringify(timelineData));
+        showSystemStatus("TIMELINE // SYNCED");
+      }
+
+      function renderTimeline() {
+        timelineData.sort((a, b) => new Date(a.sortDate || 0) - new Date(b.sortDate || 0));
+        timelineBody.innerHTML = '';
+        timelineData.forEach((row, index) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="cell-month">
+              <div class="month-container">
+                <input type="date" class="date-picker-input" data-index="${index}" value="${row.sortDate || ''}" aria-label="Sort Order Date">
+                <div class="editable-cell" contenteditable="true" data-index="${index}" data-key="month">${row.month}</div>
+              </div>
+            </td>
+            <td class="cell-phase">
+              <div class="editable-cell" contenteditable="true" data-index="${index}" data-key="phase">${row.phase}</div>
+            </td>
+            <td class="cell-focus">
+              <div class="editable-cell" contenteditable="true" data-index="${index}" data-key="focus">${row.focus}</div>
+            </td>
+            <td class="cell-actions">
+              <button class="delete-btn" data-index="${index}" aria-label="Delete Row">×</button>
+            </td>
+          `;
+          timelineBody.appendChild(tr);
+        });
+
+        attachTimelineListeners();
+      }
+
+      function attachTimelineListeners() {
+        timelineBody.querySelectorAll('.editable-cell').forEach(cell => {
+          cell.addEventListener('input', (e) => {
+            const index = e.target.getAttribute('data-index');
+            timelineData[index][e.target.getAttribute('data-key')] = e.target.innerText;
+            saveTimelineData();
+          });
+        });
+
+        timelineBody.querySelectorAll('.date-picker-input').forEach(picker => {
+          picker.addEventListener('change', (e) => {
+            timelineData[e.target.getAttribute('data-index')].sortDate = e.target.value;
+            saveTimelineData();
+            renderTimeline();
+          });
+        });
+
+        timelineBody.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            timelineData.splice(e.target.getAttribute('data-index'), 1);
+            saveTimelineData();
+            renderTimeline();
+          });
+        });
+      }
+
+      addRowBtn.addEventListener('click', () => {
+        const today = new Date().toISOString().split('T')[0];
+        timelineData.push({ sortDate: today, month: "New Entry", phase: "New Phase", focus: "New Focus" });
+        saveTimelineData();
+        renderTimeline();
+      });
+
+      function formatDateStr(year, month, day) {
+        return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+
+      function renderCalendar() {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        monthDisplay.textContent = `${monthNames[month]} ${year}`;
+
+        const headers = calendarGrid.querySelectorAll('.weekday-header');
+        calendarGrid.innerHTML = '';
+        headers.forEach(h => calendarGrid.appendChild(h));
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+        for (let i = 0; i < firstDayIndex; i++) {
+          const cell = document.createElement('div');
+          cell.className = 'day-cell empty';
+          calendarGrid.appendChild(cell);
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+          const dateStr = formatDateStr(year, month, i);
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
+          if (isCurrentMonth && today.getDate() === i) cell.classList.add('today');
+
+          cell.innerHTML = `<div class="day-number mono">${i}</div>`;
+          const dayData = eventsData[dateStr];
+          if (dayData && (dayData.notes || dayData.marked)) {
+            const indicators = document.createElement('div');
+            indicators.className = 'indicators';
+            if (dayData.marked) indicators.innerHTML += `<div class="indicator-mark"></div>`;
+            if (dayData.notes) indicators.innerHTML += `<div class="indicator-note"></div>`;
+            cell.appendChild(indicators);
+          }
+
+          cell.addEventListener('click', () => openPanel(dateStr));
+          calendarGrid.appendChild(cell);
+        }
+      }
+
+      function openPanel(dateStr) {
+        selectedDateStr = dateStr;
+        const parts = dateStr.split('-');
+        document.getElementById('panelDateDisplay').textContent = `${parts[1]}/${parts[2]}/${parts[0]}`;
+        const data = eventsData[dateStr] || { notes: '', marked: false };
+        noteInput.value = data.notes;
+        markToggle.checked = data.marked;
+        sidePanel.classList.add('open');
+        panelOverlay.classList.add('active');
+      }
+
+      function closePanel() {
+        sidePanel.classList.remove('open');
+        panelOverlay.classList.remove('active');
+        selectedDateStr = null;
+      }
+
+      document.getElementById('saveDataBtn').addEventListener('click', () => {
+        if (!selectedDateStr) return;
+        const notes = noteInput.value;
+        const marked = markToggle.checked;
+        if (notes.trim() === '' && !marked) delete eventsData[selectedDateStr];
+        else eventsData[selectedDateStr] = { notes, marked };
+
+        localStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(eventsData));
+        showSystemStatus("CALENDAR // DATA COMMITTED");
+        closePanel();
+        renderCalendar();
+        renderCalendarNotesList(); // Reactive update for notes view
+      });
+
+      document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+      document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+      document.getElementById('closePanel').addEventListener('click', closePanel);
+      panelOverlay.addEventListener('click', closePanel);
+
+      function renderCalendarNotesList() {
+        calNotesListContainer.innerHTML = '';
+        const sortedDates = Object.keys(eventsData).sort();
+
+        if (sortedDates.length === 0) {
+          calNotesListContainer.innerHTML = `<div class="mono" style="color: var(--steel); padding: 20px;">No calendar logs detected.</div>`;
+          return;
+        }
+
+        sortedDates.forEach(date => {
+          const data = eventsData[date];
+          if (data.notes || data.marked) {
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.innerHTML = `
+              <div class="note-card-header">
+                <div class="note-card-date">${date}</div>
+                ${data.marked ? '<div class="important-badge">CRITICAL FLAG</div>' : ''}
+              </div>
+              <div class="note-card-content">${data.notes ? data.notes : '<span style="color:var(--steel); font-style:italic;">[No textual data logged]</span>'}</div>
+            `;
+            calNotesListContainer.appendChild(card);
+          }
+        });
+      }
+
+      function renderGenNotesList() {
+        genNotesList.innerHTML = '';
+        if (importantNotes.length === 0) {
+          genNotesList.innerHTML = `<div class="mono" style="color: var(--steel); font-size: 11px;">NO RECORDS FOUND</div>`;
+        }
+        importantNotes.forEach(note => {
+          const btn = document.createElement('div');
+          btn.className = `note-card ${activeGenNoteId === note.id ? 'active' : ''}`;
+          btn.style.padding = '12px';
+          btn.style.cursor = 'pointer';
+          btn.style.borderColor = activeGenNoteId === note.id ? 'var(--volt)' : 'var(--graphite)';
+          btn.innerHTML = `<div class="mono" style="font-size: 12px; color: ${activeGenNoteId === note.id ? 'var(--volt)' : 'var(--titanium)'}">${note.title || 'Untitled Record'}</div>`;
+
+          btn.addEventListener('click', () => loadGenNote(note.id));
+          genNotesList.appendChild(btn);
+        });
+      }
+
+      function loadGenNote(id) {
+        activeGenNoteId = id;
+        const note = importantNotes.find(n => n.id === id);
+        if (note) {
+          genNoteTitle.value = note.title;
+          genNoteContent.value = note.content;
+          document.getElementById('deleteGenNoteBtn').style.display = 'block';
+        }
+        renderGenNotesList();
+      }
+
+      function clearGenNoteEditor() {
+        activeGenNoteId = null;
+        genNoteTitle.value = '';
+        genNoteContent.value = '';
+        document.getElementById('deleteGenNoteBtn').style.display = 'none';
+        renderGenNotesList();
+      }
+
+      document.getElementById('newGenNoteBtn').addEventListener('click', clearGenNoteEditor);
+
+      document.getElementById('saveGenNoteBtn').addEventListener('click', () => {
+        const title = genNoteTitle.value.trim();
+        const content = genNoteContent.value.trim();
+        if (!title && !content) return;
+
+        if (activeGenNoteId) {
+          const note = importantNotes.find(n => n.id === activeGenNoteId);
+          if (note) { note.title = title; note.content = content; }
+        } else {
+          const newId = Date.now().toString();
+          importantNotes.push({ id: newId, title, content, date: new Date().toISOString() });
+          activeGenNoteId = newId;
+        }
+
+        localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(importantNotes));
+        showSystemStatus("DATACORE // RECORD SAVED");
+        document.getElementById('deleteGenNoteBtn').style.display = 'block';
+        renderGenNotesList();
+      });
+
+      document.getElementById('deleteGenNoteBtn').addEventListener('click', () => {
+        if (!activeGenNoteId) return;
+        importantNotes = importantNotes.filter(n => n.id !== activeGenNoteId);
+        localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(importantNotes));
+        showSystemStatus("DATACORE // RECORD PURGED");
+        clearGenNoteEditor();
+      });
+
+      function showSystemStatus(msg) {
+        hudStatus.textContent = msg;
+        setTimeout(() => { hudStatus.textContent = "SYSTEM ONLINE // SECURE CONNECTION"; }, 3000);
+      }
+
+      function updateClock() {
+        const now = new Date();
+        document.getElementById('hudTime').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+      }
+
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // Theme Management
+      const settingsOverlay = document.getElementById('settingsOverlay');
+      const settingsBtn = document.getElementById('settingsBtn');
+      const closeSettings = document.getElementById('closeSettings');
+      const settingsTabsBtn = document.querySelectorAll('.settings-tab');
+      const settingsContents = document.querySelectorAll('.settings-content');
+
+      const themeSelect = document.getElementById('themeSelect');
+      const saveNewThemeBtn = document.getElementById('saveNewThemeBtn');
+      const deleteThemeBtn = document.getElementById('deleteThemeBtn');
+      const themeColorInputs = document.querySelectorAll('.theme-color-input');
+
+      settingsBtn.addEventListener('click', () => { settingsOverlay.classList.add('active'); });
+      closeSettings.addEventListener('click', () => { settingsOverlay.classList.remove('active'); });
+
+      settingsTabsBtn.forEach(tab => {
+        tab.addEventListener('click', () => {
+          settingsTabsBtn.forEach(t => t.classList.remove('active'));
+          settingsContents.forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.target).classList.add('active');
+        });
+      });
+
+      function applyThemeColors(colors) {
+        for (const [variable, value] of Object.entries(colors)) {
+          document.documentElement.style.setProperty(variable, value);
+          const input = document.querySelector(`.theme-color-input[data-var="${variable}"]`);
+          if (input) input.value = value;
+        }
+      }
+
+      function loadThemeList() {
+        // Clear except default
+        while (themeSelect.options.length > 1) {
+          themeSelect.remove(1);
+        }
+        for (const themeName of Object.keys(savedThemes)) {
+          const option = document.createElement('option');
+          option.value = themeName;
+          option.textContent = themeName;
+          themeSelect.appendChild(option);
+        }
+        const activeTheme = localStorage.getItem('matrix_active_theme') || 'default';
+        if (!savedThemes[activeTheme] && activeTheme !== 'default') {
+          themeSelect.value = 'default';
+          localStorage.setItem('matrix_active_theme', 'default');
+        } else {
+          themeSelect.value = activeTheme;
+        }
+
+        if (themeSelect.value === 'default') {
+          applyThemeColors(defaultColors);
+          deleteThemeBtn.style.display = 'none';
+        } else {
+          applyThemeColors(savedThemes[themeSelect.value]);
+          deleteThemeBtn.style.display = 'block';
+        }
+      }
+
+      themeColorInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          document.documentElement.style.setProperty(e.target.dataset.var, e.target.value);
+          if (themeSelect.value !== 'default' && savedThemes[themeSelect.value]) {
+            savedThemes[themeSelect.value][e.target.dataset.var] = e.target.value;
+            localStorage.setItem(THEMES_STORAGE_KEY, JSON.stringify(savedThemes));
+          } else {
+            // Default theme modified, implicitly create "Custom"
+            themeSelect.value = 'default';
+            deleteThemeBtn.style.display = 'none';
+          }
+        });
+      });
+
+      themeSelect.addEventListener('change', (e) => {
+        const theme = e.target.value;
+        localStorage.setItem('matrix_active_theme', theme);
+        if (theme === 'default') {
+          applyThemeColors(defaultColors);
+          deleteThemeBtn.style.display = 'none';
+        } else if (savedThemes[theme]) {
+          applyThemeColors(savedThemes[theme]);
+          deleteThemeBtn.style.display = 'block';
+        }
+        showSystemStatus("THEME // APPLIED");
+      });
+
+      deleteThemeBtn.addEventListener('click', () => {
+        const theme = themeSelect.value;
+        if (theme === 'default') return;
+        if (confirm(`Are you sure you want to purge the theme "${theme}"?`)) {
+          delete savedThemes[theme];
+          localStorage.setItem(THEMES_STORAGE_KEY, JSON.stringify(savedThemes));
+          localStorage.setItem('matrix_active_theme', 'default');
+          loadThemeList();
+          showSystemStatus("THEME // PURGED");
+        }
+      });
+
+      saveNewThemeBtn.addEventListener('click', () => {
+        const themeName = prompt("Enter a name for the new theme:");
+        if (!themeName) return;
+        if (themeName === 'default') {
+          alert("Cannot overwrite the default theme.");
+          return;
+        }
+
+        const currentColors = {};
+        themeColorInputs.forEach(input => {
+          currentColors[input.dataset.var] = input.value;
+        });
+
+        savedThemes[themeName] = currentColors;
+        localStorage.setItem(THEMES_STORAGE_KEY, JSON.stringify(savedThemes));
+
+        loadThemeList();
+        themeSelect.value = themeName;
+        localStorage.setItem('matrix_active_theme', themeName);
+        showSystemStatus("THEME // SAVED");
+      });
+
+      // Initial Render
+      loadThemeList();
+      renderTimeline();
+      renderCalendar();
+      renderCalendarNotesList();
+      renderGenNotesList();
+
+    })();
+  </script>
+</body>
+
+</html>
