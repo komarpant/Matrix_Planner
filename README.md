@@ -1,5 +1,7 @@
 # MATRIX // PLANNER
 
+[![Build Android APK](https://github.com/komarpant/Matrix_Planner/actions/workflows/android.yml/badge.svg)](https://github.com/komarpant/Matrix_Planner/actions/workflows/android.yml)
+
 Matrix Planner is a futuristic, highly functional task planner designed to organize complex tasks, roadmap projections, and daily logs in an efficient, distraction-free environment. 
 
 Inspired by a cyberpunk aesthetic and designed for deep-focus work, it helps users manage their timelines systematically, combining calendar views with targeted roadmap planning and central datacore notes.
@@ -19,6 +21,14 @@ Inspired by a cyberpunk aesthetic and designed for deep-focus work, it helps use
 Matrix Planner is built as a single-page web app but is packaged for native platforms:
 - **Windows**: Packaged as a standalone desktop application using Electron and electron-builder.
 - **Android**: Packaged as a native Android application using Capacitor, featuring full mobile responsiveness and safe-area notch support.
+
+## 📥 Download
+
+### Android APK (Automated Cloud Build)
+You don't need to compile the app yourself! Every time the code is updated, a fresh Android `.apk` is automatically built by GitHub Actions.
+
+👉 **[Download the Latest Android APK Here](https://github.com/komarpant/Matrix_Planner/actions/workflows/android.yml)**
+*(Click on the latest successful green checkmark, scroll to the bottom, and download the `MatrixPlanner-Android-APK` artifact).*
 
 ## Getting Started
 
